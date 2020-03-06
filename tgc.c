@@ -1,5 +1,6 @@
 #include "tgc.h"
 
+#define EXPORT __attribute__ ((visibility("default")))
 #define NOINLINE __attribute__ ((noinline))
 
 static size_t tgc_hash(void *ptr) {
@@ -233,6 +234,7 @@ static void tgc_mark(tgc_t *gc) {
 
 }
 
+EXPORT
 void tgc_sweep(tgc_t *gc) {
   
   size_t i, j, k, nj, nh;
@@ -298,6 +300,7 @@ void tgc_sweep(tgc_t *gc) {
   
 }
 
+EXPORT
 void tgc_start(tgc_t *gc, void *stk) {
   gc->bottom = stk;
   gc->paused = 0;
@@ -313,20 +316,24 @@ void tgc_start(tgc_t *gc, void *stk) {
   gc->sweepfactor = 0.5;
 }
 
+EXPORT
 void tgc_stop(tgc_t *gc) {
   tgc_sweep(gc);
   free(gc->items);
   free(gc->frees);
 }
 
+EXPORT
 void tgc_pause(tgc_t *gc) {
   gc->paused = 1;
 }
 
+EXPORT
 void tgc_resume(tgc_t *gc) {
   gc->paused = 0;
 }
 
+EXPORT
 void tgc_run(tgc_t *gc) {
   tgc_mark(gc);
   tgc_sweep(gc);
@@ -361,14 +368,17 @@ static void tgc_rem(tgc_t *gc, void *ptr) {
   gc->mitems = gc->nitems + gc->nitems / 2 + 1;
 }
 
+EXPORT
 void *tgc_alloc(tgc_t *gc, size_t size) {
   return tgc_alloc_opt(gc, size, 0, NULL);
 }
 
+EXPORT
 void *tgc_calloc(tgc_t *gc, size_t num, size_t size) {
   return tgc_calloc_opt(gc, num, size, 0, NULL);
 }
 
+EXPORT
 void *tgc_realloc(tgc_t *gc, void *ptr, size_t size) {
   
   tgc_ptr_t *p;
@@ -402,6 +412,7 @@ void *tgc_realloc(tgc_t *gc, void *ptr, size_t size) {
   return NULL;
 }
 
+EXPORT
 void tgc_free(tgc_t *gc, void *ptr) {
   tgc_ptr_t *p  = tgc_get_ptr(gc, ptr);
   if (p) {
@@ -413,6 +424,7 @@ void tgc_free(tgc_t *gc, void *ptr) {
   }
 }
 
+EXPORT
 void *tgc_alloc_opt(tgc_t *gc, size_t size, int flags, void(*dtor)(void*)) {
   void *ptr = malloc(size);
   if (ptr != NULL) {
@@ -421,6 +433,7 @@ void *tgc_alloc_opt(tgc_t *gc, size_t size, int flags, void(*dtor)(void*)) {
   return ptr;
 }
 
+EXPORT
 void *tgc_calloc_opt(
   tgc_t *gc, size_t num, size_t size, 
   int flags, void(*dtor)(void*)) {
@@ -431,28 +444,33 @@ void *tgc_calloc_opt(
   return ptr;
 }
 
+EXPORT
 void tgc_set_dtor(tgc_t *gc, void *ptr, void(*dtor)(void*)) {
   tgc_ptr_t *p  = tgc_get_ptr(gc, ptr);
   if (p) { p->dtor = dtor; }
 }
 
+EXPORT
 void tgc_set_flags(tgc_t *gc, void *ptr, int flags) {
   tgc_ptr_t *p  = tgc_get_ptr(gc, ptr);
   if (p) { p->flags = flags; }
 }
 
+EXPORT
 int tgc_get_flags(tgc_t *gc, void *ptr) {
   tgc_ptr_t *p  = tgc_get_ptr(gc, ptr);
   if (p) { return p->flags; }
   return 0;
 }
 
+EXPORT
 void(*tgc_get_dtor(tgc_t *gc, void *ptr))(void*) {
   tgc_ptr_t *p  = tgc_get_ptr(gc, ptr);
   if (p) { return p->dtor; }
   return NULL;
 }
 
+EXPORT
 size_t tgc_get_size(tgc_t *gc, void *ptr) {
   tgc_ptr_t *p  = tgc_get_ptr(gc, ptr);
   if (p) { return p->size; }

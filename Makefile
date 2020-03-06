@@ -1,7 +1,6 @@
-CC ?= gcc
+CC ?= clang
 AR ?= ar
-CFLAGS = -ansi -O3 -fpic -pedantic -g -Wall -Wno-unused
-LFLAGS = -fpic
+CFLAGS = -pipe -O3 -fPIC -flto -fno-stack-protector -fvisibility=hidden -march=native
 ECFLAGS = -std=c99 -O3 -g
 
 INCDIR = $(PREFIX)/include
@@ -23,7 +22,7 @@ $(OBJECT): tgc.c tgc.h
 	$(CC) -c $(CFLAGS) tgc.c
 
 $(DYNAMIC): $(OBJECT)
-	$(CC) -shared -o $@ $^
+	$(CC) -shared $(CFLAGS) -o $@ $^
 
 $(STATIC): $(OBJECT)
 	$(AR) rcs $@ $^
