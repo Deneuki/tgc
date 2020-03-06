@@ -7,6 +7,8 @@ About
 `tgc` is a tiny garbage collector for C written in ~500 lines of code and based 
 on the [Cello Garbage Collector](http://libcello.org/learn/garbage-collection).
 
+This project is forked for fun from https://github.com/orangeduck/tgc, and introduces some absolutely minor changes that probably make it worse and less portable.
+
 ```c
 #include "tgc.h"
 
