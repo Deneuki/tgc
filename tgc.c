@@ -1,5 +1,7 @@
 #include "tgc.h"
 
+#define NOINLINE __attribute__ ((noinline))
+
 static size_t tgc_hash(void *ptr) {
   return ((uintptr_t)ptr) >> 3;
 }
@@ -124,7 +126,7 @@ static int tgc_rehash(tgc_t* gc, size_t new_size) {
   size_t old_size = gc->nslots;
   
   gc->nslots = new_size;
-  gc->items = calloc(gc->nslots, sizeof(tgc_ptr_t));
+  gc->items = (tgc_ptr_t *) calloc(gc->nslots, sizeof(tgc_ptr_t));
   
   if (gc->items == NULL) {
     gc->nslots = old_size;
@@ -183,6 +185,7 @@ static void tgc_mark_ptr(tgc_t *gc, void *ptr) {
   
 }
 
+NOINLINE
 static void tgc_mark_stack(tgc_t *gc) {
   
   void *stk, *bot, *top, *p;
@@ -208,7 +211,6 @@ static void tgc_mark(tgc_t *gc) {
   
   size_t i, k;
   jmp_buf env;
-  void (*volatile mark_stack)(tgc_t*) = tgc_mark_stack;
   
   if (gc->nitems == 0) { return; }
   
@@ -227,7 +229,7 @@ static void tgc_mark(tgc_t *gc) {
   
   memset(&env, 0, sizeof(jmp_buf));
   setjmp(env);
-  mark_stack(gc);
+  tgc_mark_stack(gc);
 
 }
 
@@ -245,7 +247,7 @@ void tgc_sweep(tgc_t *gc) {
     gc->nfrees++;
   }
 
-  gc->frees = realloc(gc->frees, sizeof(tgc_ptr_t) * gc->nfrees);
+  gc->frees = (tgc_ptr_t *) realloc(gc->frees, sizeof(tgc_ptr_t) * gc->nfrees);
   if (gc->frees == NULL) { return; }
   
   i = 0; k = 0;
