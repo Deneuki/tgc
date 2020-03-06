@@ -1,19 +1,19 @@
-CC ?= clang
-AR ?= ar
-CFLAGS = -pipe -O3 -fPIC -flto -fno-stack-protector -fvisibility=hidden -march=native
-ECFLAGS = -std=c99 -O3 -g
+CC := clang
+AR := ar
+CFLAGS := -pipe -O3 -fPIC -flto -fno-stack-protector -fvisibility=hidden -march=native
+ECFLAGS := -std=c99 -O3 -g
 
-INCDIR = $(PREFIX)/include
-LIBDIR = $(PREFIX)/lib
+INCDIR := $(PREFIX)/include
+LIBDIR := $(PREFIX)/lib
 
-OBJECT = tgc.o
-STATIC = libtgc.a
-DYNAMIC = libtgc.so
+OBJECT := tgc.o
+STATIC := libtgc.a
+DYNAMIC := libtgc.so
 
 ifeq ($(findstring MINGW,$(shell uname)),MINGW)
-  CHECKER = 
+  CHECKER := 
 else 
-  CHECKER = valgrind --undef-value-errors=no  --leak-check=full 
+  CHECKER := valgrind --undef-value-errors=no  --leak-check=full 
 endif
 
 all: $(STATIC) $(DYNAMIC)
